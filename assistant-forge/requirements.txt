@@ -1,0 +1,6 @@
+rapidocr-onnxruntime
+openvino
+mss
+numpy
+opencv-python
+pillow

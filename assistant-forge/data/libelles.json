@@ -1,0 +1,285 @@
+{
+  "_explication": "Associe le texte lu à l'écran (sans accents, en minuscules) à une ligne de l'objet. Une clé commençant par % = valeur affichée avec un signe %. vu_en_jeu=false : libellé déduit des guides, pas encore confirmé sur une capture réelle.",
+  "libelles": {
+    "vitalite": {
+      "id": "vitalite",
+      "poids": "vitalite",
+      "vu_en_jeu": true
+    },
+    "puissance": {
+      "id": "puissance",
+      "poids": "puissance",
+      "vu_en_jeu": true
+    },
+    "%critique": {
+      "id": "coup_critique",
+      "poids": "coup_critique",
+      "vu_en_jeu": true
+    },
+    "portee": {
+      "id": "po",
+      "poids": "po",
+      "vu_en_jeu": true
+    },
+    "dommages neutre": {
+      "id": "do_neutre",
+      "poids": "do_elements",
+      "vu_en_jeu": true
+    },
+    "dommages terre": {
+      "id": "do_terre",
+      "poids": "do_elements",
+      "vu_en_jeu": true
+    },
+    "dommages feu": {
+      "id": "do_feu",
+      "poids": "do_elements",
+      "vu_en_jeu": true
+    },
+    "dommages eau": {
+      "id": "do_eau",
+      "poids": "do_elements",
+      "vu_en_jeu": true
+    },
+    "dommages air": {
+      "id": "do_air",
+      "poids": "do_elements",
+      "vu_en_jeu": true
+    },
+    "%resistance neutre": {
+      "id": "pct_res_neutre",
+      "poids": "pct_resistance",
+      "vu_en_jeu": true
+    },
+    "%resistance terre": {
+      "id": "pct_res_terre",
+      "poids": "pct_resistance",
+      "vu_en_jeu": false
+    },
+    "resistance terre": {
+      "id": "res_terre",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "%resistance feu": {
+      "id": "pct_res_feu",
+      "poids": "pct_resistance",
+      "vu_en_jeu": true
+    },
+    "resistance feu": {
+      "id": "res_feu",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "%resistance eau": {
+      "id": "pct_res_eau",
+      "poids": "pct_resistance",
+      "vu_en_jeu": true
+    },
+    "resistance eau": {
+      "id": "res_eau",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "%resistance air": {
+      "id": "pct_res_air",
+      "poids": "pct_resistance",
+      "vu_en_jeu": false
+    },
+    "resistance air": {
+      "id": "res_air",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "resistance neutre": {
+      "id": "res_neutre",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "force": {
+      "id": "force",
+      "poids": "force",
+      "vu_en_jeu": false
+    },
+    "intelligence": {
+      "id": "intelligence",
+      "poids": "intelligence",
+      "vu_en_jeu": false
+    },
+    "agilite": {
+      "id": "agilite",
+      "poids": "agilite",
+      "vu_en_jeu": true
+    },
+    "chance": {
+      "id": "chance",
+      "poids": "chance",
+      "vu_en_jeu": false
+    },
+    "sagesse": {
+      "id": "sagesse",
+      "poids": "sagesse",
+      "vu_en_jeu": true
+    },
+    "prospection": {
+      "id": "prospection",
+      "poids": "prospection",
+      "vu_en_jeu": true
+    },
+    "initiative": {
+      "id": "initiative",
+      "poids": "initiative",
+      "vu_en_jeu": false
+    },
+    "pods": {
+      "id": "pods",
+      "poids": "pods",
+      "vu_en_jeu": false
+    },
+    "pa": {
+      "id": "pa",
+      "poids": "pa",
+      "vu_en_jeu": true
+    },
+    "pm": {
+      "id": "pm",
+      "poids": "pm",
+      "vu_en_jeu": false
+    },
+    "soins": {
+      "id": "soins",
+      "poids": "soins",
+      "vu_en_jeu": false
+    },
+    "dommages": {
+      "id": "dommages",
+      "poids": "dommages",
+      "vu_en_jeu": false
+    },
+    "fuite": {
+      "id": "fuite",
+      "poids": "fuite",
+      "vu_en_jeu": false
+    },
+    "tacle": {
+      "id": "tacle",
+      "poids": "tacle",
+      "vu_en_jeu": false
+    },
+    "invocations": {
+      "id": "invocation",
+      "poids": "invocation",
+      "vu_en_jeu": false
+    },
+    "invocation": {
+      "id": "invocation",
+      "poids": "invocation",
+      "vu_en_jeu": false
+    },
+    "dommages critiques": {
+      "id": "do_critique",
+      "poids": "do_critique",
+      "vu_en_jeu": false
+    },
+    "dommages poussee": {
+      "id": "do_poussee",
+      "poids": "do_poussee",
+      "vu_en_jeu": false
+    },
+    "dommages pieges": {
+      "id": "do_pieges",
+      "poids": "do_pieges",
+      "vu_en_jeu": false
+    },
+    "retrait pa": {
+      "id": "retrait_pa",
+      "poids": "retrait_pa_pm",
+      "vu_en_jeu": false
+    },
+    "retrait pm": {
+      "id": "retrait_pm",
+      "poids": "retrait_pa_pm",
+      "vu_en_jeu": false
+    },
+    "esquive pa": {
+      "id": "esquive_pa",
+      "poids": "esquive_pa_pm",
+      "vu_en_jeu": false
+    },
+    "esquive pm": {
+      "id": "esquive_pm",
+      "poids": "esquive_pa_pm",
+      "vu_en_jeu": true
+    },
+    "resistance critiques": {
+      "id": "res_critique",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "resistance poussee": {
+      "id": "res_poussee",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "%dommages aux sorts": {
+      "id": "pct_do_sorts",
+      "poids": "pct_dommages",
+      "vu_en_jeu": false
+    },
+    "%dommages d'armes": {
+      "id": "pct_do_armes",
+      "poids": "pct_dommages",
+      "vu_en_jeu": false
+    },
+    "%dommages a distance": {
+      "id": "pct_do_distance",
+      "poids": "pct_dommages",
+      "vu_en_jeu": false
+    },
+    "%dommages en melee": {
+      "id": "pct_do_melee",
+      "poids": "pct_dommages",
+      "vu_en_jeu": false
+    },
+    "%resistance a distance": {
+      "id": "pct_res_distance",
+      "poids": "pct_res_dist_melee",
+      "vu_en_jeu": false
+    },
+    "%resistance en melee": {
+      "id": "pct_res_melee",
+      "poids": "pct_res_dist_melee",
+      "vu_en_jeu": false
+    },
+    "renvoi de dommages": {
+      "id": "renvoi",
+      "poids": "renvoi",
+      "vu_en_jeu": false
+    },
+    "resistances poussee": {
+      "id": "res_poussee",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": true
+    },
+    "resistances critiques": {
+      "id": "res_critique",
+      "poids": "resistance_fixe",
+      "vu_en_jeu": false
+    },
+    "puissance pieges": {
+      "id": "puissance_pieges",
+      "poids": "puissance_pieges",
+      "vu_en_jeu": false
+    },
+    "arme de chasse": {
+      "id": "arme_chasse",
+      "poids": "arme_chasse",
+      "vu_en_jeu": false
+    },
+    "pods supplementaires": {
+      "id": "pods",
+      "poids": "pods",
+      "vu_en_jeu": true
+    }
+  }
+}

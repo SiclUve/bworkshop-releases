@@ -1,0 +1,384 @@
+{
+  "_avertissement": "Poids tirés du tableau du guide beta.sigilos.fr (consulté le 21/10/2026), recoupés avec d'autres guides pour PA 100, PM 90, PO 51, invocation 30, dommages 20, critique 10. Ce sont des valeurs communautaires : elles restent À VÉRIFIER avec les densités affichées dans l'interface de forgemagie de DOFUS 3. Corrige toute valeur différente ici.",
+  "_champs": "poids_par_point = densité d'un point de la stat. runes = montant du bonus par taille de rune (simple, pa, ra). over_max = over maximal indiqué par le guide (environ 101 / poids).",
+  "stats": {
+    "pa": {
+      "nom": "PA",
+      "poids_par_point": "100",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 1,
+      "verifie": false
+    },
+    "pm": {
+      "nom": "PM",
+      "poids_par_point": "90",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 1,
+      "verifie": false
+    },
+    "po": {
+      "nom": "Portée",
+      "poids_par_point": "51",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 1,
+      "verifie": false
+    },
+    "invocation": {
+      "nom": "Invocations",
+      "poids_par_point": "30",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 3,
+      "verifie": false
+    },
+    "dommages": {
+      "nom": "Dommages",
+      "poids_par_point": "20",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 5,
+      "verifie": false
+    },
+    "pct_dommages": {
+      "nom": "% Dommages sort/arme/distance/mêlée",
+      "poids_par_point": "15",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 6,
+      "verifie": false
+    },
+    "pct_res_dist_melee": {
+      "nom": "% Résistance distance/mêlée",
+      "poids_par_point": "15",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 6,
+      "verifie": false
+    },
+    "soins": {
+      "nom": "Soins",
+      "poids_par_point": "10",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 10,
+      "verifie": false
+    },
+    "coup_critique": {
+      "nom": "% Critique",
+      "poids_par_point": "10",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 10,
+      "verifie": false
+    },
+    "retrait_pa_pm": {
+      "nom": "Retrait PA/PM",
+      "poids_par_point": "7",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 14,
+      "verifie": false
+    },
+    "esquive_pa_pm": {
+      "nom": "Esquive PA/PM",
+      "poids_par_point": "7",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 14,
+      "verifie": false
+    },
+    "pct_resistance": {
+      "nom": "% Résistance élémentaire",
+      "poids_par_point": "6",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 16,
+      "verifie": false
+    },
+    "do_elements": {
+      "nom": "Dommages élémentaires",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "do_critique": {
+      "nom": "Dommages critiques",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "do_poussee": {
+      "nom": "Dommages de poussée",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "do_pieges": {
+      "nom": "Dommages de pièges",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "renvoi": {
+      "nom": "Renvoi de dommages",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "arme_chasse": {
+      "nom": "Arme de chasse",
+      "poids_par_point": "5",
+      "runes": {
+        "simple": 1
+      },
+      "over_max": 20,
+      "verifie": false
+    },
+    "fuite": {
+      "nom": "Fuite",
+      "poids_par_point": "4",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 25,
+      "verifie": false
+    },
+    "tacle": {
+      "nom": "Tacle",
+      "poids_par_point": "4",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 25,
+      "verifie": false
+    },
+    "sagesse": {
+      "nom": "Sagesse",
+      "poids_par_point": "3",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 33,
+      "verifie": false
+    },
+    "prospection": {
+      "nom": "Prospection",
+      "poids_par_point": "3",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 33,
+      "verifie": false
+    },
+    "puissance": {
+      "nom": "Puissance",
+      "poids_par_point": "2",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 50,
+      "verifie": false
+    },
+    "resistance_fixe": {
+      "nom": "Résistances fixes / crit / poussée",
+      "poids_par_point": "2",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 50,
+      "verifie": false
+    },
+    "force": {
+      "nom": "Force",
+      "poids_par_point": "1",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 101,
+      "verifie": false
+    },
+    "intelligence": {
+      "nom": "Intelligence",
+      "poids_par_point": "1",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 101,
+      "verifie": false
+    },
+    "agilite": {
+      "nom": "Agilité",
+      "poids_par_point": "1",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 101,
+      "verifie": false
+    },
+    "chance": {
+      "nom": "Chance",
+      "poids_par_point": "1",
+      "runes": {
+        "simple": 1,
+        "pa": 3,
+        "ra": 10
+      },
+      "over_max": 101,
+      "verifie": false
+    },
+    "vitalite": {
+      "nom": "Vitalité",
+      "poids_par_point": "0.2",
+      "runes": {
+        "simple": 5,
+        "pa": 15,
+        "ra": 50
+      },
+      "over_max": 505,
+      "verifie": false
+    },
+    "pods": {
+      "nom": "Pods",
+      "poids_par_point": "0.25",
+      "runes": {
+        "simple": 10,
+        "pa": 30,
+        "ra": 100
+      },
+      "over_max": 404,
+      "verifie": false
+    },
+    "initiative": {
+      "nom": "Initiative",
+      "poids_par_point": "0.1",
+      "runes": {
+        "simple": 10,
+        "pa": 30,
+        "ra": 100
+      },
+      "over_max": 1010,
+      "verifie": false
+    },
+    "puissance_pieges": {
+      "nom": "Puissance de pièges",
+      "poids_par_point": "2",
+      "runes": {
+        "simple": 1,
+        "pa": 3
+      },
+      "over_max": 50,
+      "verifie": false
+    }
+  },
+  "_exo_champs": "exo_choix = exos proposées dans l'onglet Objectif. poids = clé de la stat dans « stats ». chance_sc = chance de succès critique documentée par les guides (null = non documentée : le programme utilise ton estimation). Limite : exo + over cumulés <= 101 de poids (beta.sigilos.fr).",
+  "limite_poids_over": 101,
+  "exo_choix": [
+    {
+      "id": "pa",
+      "nom": "PA",
+      "poids": "pa",
+      "chance_sc": 0.01,
+      "rune": "Ga Pa"
+    },
+    {
+      "id": "pm",
+      "nom": "PM",
+      "poids": "pm",
+      "chance_sc": 0.01,
+      "rune": "Ga Pme"
+    },
+    {
+      "id": "po",
+      "nom": "PO",
+      "poids": "po",
+      "chance_sc": 0.01,
+      "rune": "Rune Po"
+    },
+    {
+      "id": "invocation",
+      "nom": "Invocations",
+      "poids": "invocation",
+      "chance_sc": 0.01,
+      "rune": "Rune Invo"
+    },
+    {
+      "id": "pct_do_sorts",
+      "nom": "% Dommages aux sorts",
+      "poids": "pct_dommages",
+      "chance_sc": null,
+      "rune": "Rune Do Per So"
+    },
+    {
+      "id": "pct_do_distance",
+      "nom": "% Dommages à distance",
+      "poids": "pct_dommages",
+      "chance_sc": null,
+      "rune": "Rune Do Per Di"
+    },
+    {
+      "id": "pct_do_melee",
+      "nom": "% Dommages en mêlée",
+      "poids": "pct_dommages",
+      "chance_sc": null,
+      "rune": "Rune Do Per Mé"
+    },
+    {
+      "id": "pct_do_armes",
+      "nom": "% Dommages d'armes",
+      "poids": "pct_dommages",
+      "chance_sc": null,
+      "rune": "Rune Do Per Ar"
+    }
+  ]
+}

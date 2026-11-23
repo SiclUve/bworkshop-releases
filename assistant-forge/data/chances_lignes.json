@@ -1,0 +1,1244 @@
+{
+"source": "23/10/2026, ~2 500 passes lues (journaux 22/10 soir -> 23/10 17h28), état AVANT reconstruit",
+"fin_heure": 1792769304.9,
+"cases": {
+"do_feu|3|0.5": {
+"SC": 7,
+"SN": 7,
+"EC": 0
+},
+"intelligence|10|0.25": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"intelligence|10|0.45": {
+"SC": 5,
+"SN": 3,
+"EC": 1
+},
+"intelligence|10|0.6": {
+"SC": 9,
+"SN": 3,
+"EC": 0
+},
+"intelligence|1|0.9": {
+"SC": 0,
+"SN": 8,
+"EC": 0
+},
+"do_critique|3|0.8": {
+"SC": 15,
+"SN": 53,
+"EC": 5
+},
+"intelligence|10|0.65": {
+"SC": 7,
+"SN": 9,
+"EC": 2
+},
+"intelligence|1|0.95": {
+"SC": 0,
+"SN": 15,
+"EC": 0
+},
+"sagesse|3|0.0": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"sagesse|3|0.1": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.65": {
+"SC": 7,
+"SN": 6,
+"EC": 0
+},
+"vitalite|50|0.8": {
+"SC": 10,
+"SN": 10,
+"EC": 1
+},
+"sagesse|3|0.15": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"do_feu|3|0.7": {
+"SC": 21,
+"SN": 46,
+"EC": 0
+},
+"do_critique|3|0.7": {
+"SC": 22,
+"SN": 16,
+"EC": 0
+},
+"vitalite|50|0.6": {
+"SC": 3,
+"SN": 3,
+"EC": 0
+},
+"intelligence|10|0.55": {
+"SC": 2,
+"SN": 5,
+"EC": 0
+},
+"vitalite|50|0.75": {
+"SC": 5,
+"SN": 12,
+"EC": 1
+},
+"vitalite|50|0.85": {
+"SC": 3,
+"SN": 6,
+"EC": 4
+},
+"vitalite|5|0.95": {
+"SC": 1,
+"SN": 9,
+"EC": 18
+},
+"do_feu|3|0.6": {
+"SC": 11,
+"SN": 19,
+"EC": 0
+},
+"intelligence|10|0.8": {
+"SC": 15,
+"SN": 7,
+"EC": 3
+},
+"sagesse|3|0.05": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"vitalite|5|0.9": {
+"SC": 0,
+"SN": 7,
+"EC": 0
+},
+"sagesse|3|0.25": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|15|0.85": {
+"SC": 4,
+"SN": 17,
+"EC": 2
+},
+"vitalite|15|0.9": {
+"SC": 5,
+"SN": 38,
+"EC": 24
+},
+"do_feu|1|0.8": {
+"SC": 6,
+"SN": 5,
+"EC": 0
+},
+"do_feu|1|0.9": {
+"SC": 7,
+"SN": 20,
+"EC": 0
+},
+"sagesse|1|0.0": {
+"SC": 40,
+"SN": 45,
+"EC": 1
+},
+"do_feu|3|0.0": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"do_feu|3|0.3": {
+"SC": 3,
+"SN": 5,
+"EC": 0
+},
+"intelligence|10|0.75": {
+"SC": 9,
+"SN": 13,
+"EC": 1
+},
+"do_critique|3|0.6": {
+"SC": 2,
+"SN": 6,
+"EC": 1
+},
+"intelligence|10|0.4": {
+"SC": 4,
+"SN": 0,
+"EC": 0
+},
+"intelligence|10|0.05": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"intelligence|10|0.2": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.0": {
+"SC": 5,
+"SN": 1,
+"EC": 1
+},
+"intelligence|10|0.15": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.3": {
+"SC": 6,
+"SN": 0,
+"EC": 0
+},
+"vitalite|5|0.85": {
+"SC": 0,
+"SN": 5,
+"EC": 0
+},
+"do_critique|1|0.85": {
+"SC": 8,
+"SN": 5,
+"EC": 0
+},
+"intelligence|3|0.85": {
+"SC": 3,
+"SN": 8,
+"EC": 1
+},
+"intelligence|1|0.45": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"vitalite|50|0.7": {
+"SC": 8,
+"SN": 7,
+"EC": 0
+},
+"do_critique|1|0.65": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_critique|1|0.7": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"vitalite|15|0.8": {
+"SC": 0,
+"SN": 4,
+"EC": 1
+},
+"vitalite|5|0.8": {
+"SC": 1,
+"SN": 3,
+"EC": 0
+},
+"do_critique|1|0.9": {
+"SC": 6,
+"SN": 11,
+"EC": 0
+},
+"vitalite|15|0.75": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"sagesse|10|0.05": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"intelligence|1|0.25": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|15|0.95": {
+"SC": 1,
+"SN": 5,
+"EC": 20
+},
+"vitalite|50|0.2": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.35": {
+"SC": 1,
+"SN": 3,
+"EC": 0
+},
+"vitalite|50|0.45": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.55": {
+"SC": 7,
+"SN": 2,
+"EC": 0
+},
+"intelligence|3|0.9": {
+"SC": 2,
+"SN": 3,
+"EC": 0
+},
+"do_feu|3|0.1": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_critique|3|0.5": {
+"SC": 1,
+"SN": 2,
+"EC": 1
+},
+"do_critique|3|0.45": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"do_feu|3|0.4": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"do_critique|3|0.65": {
+"SC": 4,
+"SN": 5,
+"EC": 1
+},
+"intelligence|10|0.7": {
+"SC": 2,
+"SN": 7,
+"EC": 0
+},
+"do_critique|3|0.2": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.5": {
+"SC": 6,
+"SN": 1,
+"EC": 0
+},
+"intelligence|1|0.75": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"intelligence|1|1.0": {
+"SC": 0,
+"SN": 3,
+"EC": 0
+},
+"vitalite|50|0.95": {
+"SC": 0,
+"SN": 2,
+"EC": 1
+},
+"vitalite|50|0.1": {
+"SC": 0,
+"SN": 4,
+"EC": 0
+},
+"vitalite|50|0.4": {
+"SC": 3,
+"SN": 4,
+"EC": 0
+},
+"intelligence|1|0.6": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"intelligence|1|0.8": {
+"SC": 0,
+"SN": 7,
+"EC": 0
+},
+"vitalite|50|0.9": {
+"SC": 0,
+"SN": 1,
+"EC": 1
+},
+"vitalite|5|1.0": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.85": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"intelligence|1|0.35": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|5|0.0": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"vitalite|50|0.5": {
+"SC": 2,
+"SN": 2,
+"EC": 0
+},
+"vitalite|5|0.75": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"intelligence|1|0.85": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"intelligence|3|0.7": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|5|0.7": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_critique|3|0.0": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_critique|3|0.4": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"intelligence|1|0.55": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.35": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"intelligence|3|0.75": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"intelligence|1|0.5": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"do_critique|3|1.0": {
+"SC": 0,
+"SN": 0,
+"EC": 2
+},
+"intelligence|1|0.65": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"intelligence|10|0.95": {
+"SC": 0,
+"SN": 0,
+"EC": 1
+},
+"intelligence|10|0.9": {
+"SC": 1,
+"SN": 0,
+"EC": 1
+},
+"do_critique|1|1.0": {
+"SC": 0,
+"SN": 0,
+"EC": 1
+},
+"do_critique|3|0.9": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"do_feu|1|1.0": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.25": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"sagesse|10|0.0": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"sagesse|10|0.3": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"sagesse|10|0.65": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"do_feu|3|0.2": {
+"SC": 2,
+"SN": 0,
+"EC": 0
+},
+"sagesse|3|0.85": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.0": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"do_critique|3|0.05": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_critique|3|0.25": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"agilite|3|0.85": {
+"SC": 2,
+"SN": 2,
+"EC": 1
+},
+"agilite|3|0.9": {
+"SC": 0,
+"SN": 1,
+"EC": 1
+},
+"pct_res_neutre|1|0.7": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"pct_res_neutre|1|0.8": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.85": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.8": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"pct_res_terre|1|0.9": {
+"SC": 0,
+"SN": 3,
+"EC": 1
+},
+"pct_res_terre|1|1.0": {
+"SC": 0,
+"SN": 0,
+"EC": 1
+},
+"sagesse|3|0.4": {
+"SC": 2,
+"SN": 0,
+"EC": 1
+},
+"sagesse|3|0.5": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"sagesse|3|0.55": {
+"SC": 3,
+"SN": 0,
+"EC": 0
+},
+"chance|3|0.95": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"chance|3|0.9": {
+"SC": 0,
+"SN": 3,
+"EC": 0
+},
+"force|3|0.9": {
+"SC": 1,
+"SN": 1,
+"EC": 1
+},
+"chance|3|0.8": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"pct_res_neutre|1|0.9": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"intelligence|3|0.8": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"agilite|1|0.85": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"agilite|3|0.75": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"agilite|3|0.8": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"sagesse|3|0.45": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"sagesse|3|0.6": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.7": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"force|3|0.75": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"chance|3|0.65": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"chance|3|0.7": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"chance|3|0.85": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"agilite|3|0.7": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+}
+},
+"cases_video": {
+"res_critique|3|0.0": {
+"SC": 3,
+"SN": 0,
+"EC": 0
+},
+"vitalite|15|0.75": {
+"SC": 4,
+"SN": 9,
+"EC": 0
+},
+"force|3|0.7": {
+"SC": 6,
+"SN": 6,
+"EC": 2
+},
+"force|3|0.75": {
+"SC": 3,
+"SN": 4,
+"EC": 0
+},
+"force|3|0.8": {
+"SC": 7,
+"SN": 19,
+"EC": 3
+},
+"force|3|0.85": {
+"SC": 9,
+"SN": 14,
+"EC": 4
+},
+"force|3|0.9": {
+"SC": 5,
+"SN": 31,
+"EC": 8
+},
+"force|3|1.0": {
+"SC": 2,
+"SN": 5,
+"EC": 11
+},
+"vitalite|50|0.8": {
+"SC": 8,
+"SN": 10,
+"EC": 0
+},
+"vitalite|50|0.95": {
+"SC": 1,
+"SN": 0,
+"EC": 12
+},
+"vitalite|15|0.95": {
+"SC": 1,
+"SN": 13,
+"EC": 24
+},
+"vitalite|15|1.0": {
+"SC": 1,
+"SN": 1,
+"EC": 3
+},
+"do_terre|1|0.85": {
+"SC": 26,
+"SN": 34,
+"EC": 6
+},
+"do_terre|1|0.9": {
+"SC": 22,
+"SN": 65,
+"EC": 21
+},
+"coup_critique|1|1.0": {
+"SC": 7,
+"SN": 18,
+"EC": 30
+},
+"coup_critique|1|0.0": {
+"SC": 0,
+"SN": 1,
+"EC": 1
+},
+"coup_critique|1|0.1": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"coup_critique|1|0.25": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"coup_critique|1|0.4": {
+"SC": 2,
+"SN": 3,
+"EC": 0
+},
+"res_critique|3|0.2": {
+"SC": 3,
+"SN": 3,
+"EC": 0
+},
+"res_critique|3|0.35": {
+"SC": 5,
+"SN": 2,
+"EC": 0
+},
+"res_critique|3|0.45": {
+"SC": 3,
+"SN": 5,
+"EC": 1
+},
+"res_critique|3|0.6": {
+"SC": 14,
+"SN": 17,
+"EC": 1
+},
+"res_critique|3|0.7": {
+"SC": 11,
+"SN": 12,
+"EC": 3
+},
+"do_terre|1|0.6": {
+"SC": 4,
+"SN": 5,
+"EC": 1
+},
+"do_terre|1|0.65": {
+"SC": 4,
+"SN": 12,
+"EC": 0
+},
+"do_terre|1|0.7": {
+"SC": 12,
+"SN": 10,
+"EC": 0
+},
+"do_terre|1|0.8": {
+"SC": 14,
+"SN": 14,
+"EC": 4
+},
+"force|3|0.95": {
+"SC": 1,
+"SN": 8,
+"EC": 15
+},
+"res_critique|3|0.25": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"res_critique|3|0.4": {
+"SC": 8,
+"SN": 8,
+"EC": 0
+},
+"res_critique|3|0.5": {
+"SC": 5,
+"SN": 4,
+"EC": 0
+},
+"sagesse|3|0.45": {
+"SC": 3,
+"SN": 3,
+"EC": 0
+},
+"sagesse|3|0.5": {
+"SC": 6,
+"SN": 5,
+"EC": 0
+},
+"sagesse|3|0.6": {
+"SC": 8,
+"SN": 4,
+"EC": 0
+},
+"sagesse|3|0.65": {
+"SC": 1,
+"SN": 7,
+"EC": 0
+},
+"sagesse|3|0.7": {
+"SC": 7,
+"SN": 9,
+"EC": 1
+},
+"coup_critique|1|0.7": {
+"SC": 12,
+"SN": 24,
+"EC": 0
+},
+"coup_critique|1|0.85": {
+"SC": 22,
+"SN": 42,
+"EC": 8
+},
+"do_terre|1|1.0": {
+"SC": 9,
+"SN": 23,
+"EC": 31
+},
+"force|10|0.8": {
+"SC": 5,
+"SN": 13,
+"EC": 6
+},
+"res_critique|3|0.55": {
+"SC": 7,
+"SN": 9,
+"EC": 0
+},
+"res_critique|3|0.65": {
+"SC": 9,
+"SN": 16,
+"EC": 0
+},
+"res_critique|3|0.8": {
+"SC": 18,
+"SN": 19,
+"EC": 15
+},
+"vitalite|50|0.85": {
+"SC": 5,
+"SN": 10,
+"EC": 1
+},
+"coup_critique|1|0.55": {
+"SC": 8,
+"SN": 6,
+"EC": 1
+},
+"sagesse|10|0.55": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"sagesse|10|0.75": {
+"SC": 0,
+"SN": 0,
+"EC": 1
+},
+"force|10|0.9": {
+"SC": 2,
+"SN": 11,
+"EC": 2
+},
+"vitalite|15|0.9": {
+"SC": 5,
+"SN": 44,
+"EC": 19
+},
+"res_critique|3|0.75": {
+"SC": 7,
+"SN": 14,
+"EC": 1
+},
+"res_critique|3|0.85": {
+"SC": 5,
+"SN": 3,
+"EC": 6
+},
+"vitalite|15|0.85": {
+"SC": 4,
+"SN": 8,
+"EC": 4
+},
+"force|10|0.0": {
+"SC": 12,
+"SN": 4,
+"EC": 2
+},
+"force|10|0.2": {
+"SC": 13,
+"SN": 4,
+"EC": 0
+},
+"force|10|0.4": {
+"SC": 9,
+"SN": 9,
+"EC": 0
+},
+"force|10|0.6": {
+"SC": 6,
+"SN": 10,
+"EC": 1
+},
+"force|10|1.0": {
+"SC": 0,
+"SN": 2,
+"EC": 9
+},
+"res_critique|3|0.1": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.9": {
+"SC": 2,
+"SN": 0,
+"EC": 0
+},
+"sagesse|3|0.4": {
+"SC": 1,
+"SN": 3,
+"EC": 0
+},
+"sagesse|3|0.8": {
+"SC": 1,
+"SN": 7,
+"EC": 1
+},
+"do_neutre|1|0.2": {
+"SC": 4,
+"SN": 9,
+"EC": 0
+},
+"do_neutre|1|0.25": {
+"SC": 6,
+"SN": 7,
+"EC": 0
+},
+"do_neutre|1|0.05": {
+"SC": 5,
+"SN": 4,
+"EC": 0
+},
+"do_neutre|1|0.1": {
+"SC": 7,
+"SN": 4,
+"EC": 0
+},
+"do_neutre|1|0.0": {
+"SC": 4,
+"SN": 1,
+"EC": 0
+},
+"do_neutre|1|0.3": {
+"SC": 6,
+"SN": 8,
+"EC": 0
+},
+"do_neutre|1|0.4": {
+"SC": 9,
+"SN": 6,
+"EC": 0
+},
+"do_neutre|1|0.45": {
+"SC": 7,
+"SN": 6,
+"EC": 0
+},
+"do_neutre|1|0.5": {
+"SC": 9,
+"SN": 3,
+"EC": 0
+},
+"vitalite|15|0.7": {
+"SC": 0,
+"SN": 7,
+"EC": 2
+},
+"force|10|0.95": {
+"SC": 0,
+"SN": 9,
+"EC": 0
+},
+"force|1|0.9": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"sagesse|3|0.55": {
+"SC": 4,
+"SN": 5,
+"EC": 2
+},
+"force|10|0.75": {
+"SC": 2,
+"SN": 4,
+"EC": 0
+},
+"sagesse|3|0.75": {
+"SC": 4,
+"SN": 4,
+"EC": 0
+},
+"vitalite|50|0.65": {
+"SC": 2,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.55": {
+"SC": 2,
+"SN": 0,
+"EC": 0
+},
+"force|3|0.6": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"force|3|0.65": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|15|0.8": {
+"SC": 3,
+"SN": 7,
+"EC": 1
+},
+"force|10|0.7": {
+"SC": 1,
+"SN": 2,
+"EC": 0
+},
+"res_critique|3|0.3": {
+"SC": 3,
+"SN": 3,
+"EC": 0
+},
+"force|10|0.85": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"res_critique|3|0.9": {
+"SC": 1,
+"SN": 4,
+"EC": 2
+},
+"force|1|1.0": {
+"SC": 0,
+"SN": 1,
+"EC": 1
+},
+"sagesse|10|0.5": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"do_neutre|1|0.7": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"do_neutre|1|0.8": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"res_critique|3|1.0": {
+"SC": 3,
+"SN": 1,
+"EC": 1
+},
+"force|1|0.4": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_neutre|1|0.6": {
+"SC": 7,
+"SN": 3,
+"EC": 1
+},
+"do_neutre|1|0.65": {
+"SC": 1,
+"SN": 5,
+"EC": 0
+},
+"force|1|0.85": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"res_critique|3|0.95": {
+"SC": 0,
+"SN": 3,
+"EC": 3
+},
+"vitalite|15|0.6": {
+"SC": 3,
+"SN": 4,
+"EC": 0
+},
+"vitalite|15|0.65": {
+"SC": 1,
+"SN": 5,
+"EC": 1
+},
+"vitalite|50|0.6": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"sagesse|3|0.3": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"sagesse|3|0.35": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"sagesse|3|0.85": {
+"SC": 0,
+"SN": 2,
+"EC": 1
+},
+"do_terre|1|0.3": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.35": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"force|3|0.4": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"force|3|0.45": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"vitalite|50|0.75": {
+"SC": 0,
+"SN": 2,
+"EC": 0
+},
+"res_critique|3|0.05": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_terre|1|0.5": {
+"SC": 2,
+"SN": 3,
+"EC": 0
+},
+"sagesse|3|0.9": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+},
+"do_terre|1|0.45": {
+"SC": 1,
+"SN": 1,
+"EC": 0
+},
+"do_terre|1|0.25": {
+"SC": 1,
+"SN": 0,
+"EC": 0
+},
+"do_terre|1|0.4": {
+"SC": 0,
+"SN": 1,
+"EC": 0
+}
+},
+"source_video": "Vidéo d'un autre joueur (Anneau du Comte Harebourg, 23/10/2026 19h52-22h47), ~1 550 passes lues par le texte de l'historique (doublons de la vidéo retirés). Échecs attribués à la dernière rune vue : moins sûr, compte avec le poids POIDS_VIDEO."
+}
