@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3000"
+  },
+  "bundle": {
+    "active": true,
+    "category": "Utility",
+    "copyright": "bworkshop.app",
+    "targets": "all",
+    "externalBin": [],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "longDescription": "Dofus QuickTranslate Always-on-Top Overlay HUD with offline game lexicon & instant clipboard translation.",
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "",
+      "exceptionDomain": "",
+      "signingIdentity": null,
+      "entitlements": null
+    },
+    "resources": [],
+    "shortDescription": "Dofus Translation HUD",
+    "linux": {
+      "deb": {
+        "depends": []
+      }
+    }
+  },
+  "productName": "Bworklingo",
+  "mainBinaryName": "Bworklingo",
+  "version": "0.2.0",
+  "identifier": "app.bworkshop.bworklingo",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "fullscreen": false,
+        "height": 560,
+        "minHeight": 240,
+        "minWidth": 300,
+        "resizable": true,
+        "title": "Bworklingo (Always-On-Top)",
+        "width": 460,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "transparent": false,
+        "visible": true,
+        "useHttpsScheme": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}

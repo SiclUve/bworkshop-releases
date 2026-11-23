@@ -1,0 +1,1 @@
+{"name":"Dofus QuickTranslate Overlay","description":"Outil de traduction rapide FR/EN/ES/PT pour Dofus avec overlay compact Always-On-Top, lexique du jeu 19 030+ termes, copie automatique et support .exe natif.","requestFramePermissions":["clipboard-read","clipboard-write"],"majorCapabilities":["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]}
