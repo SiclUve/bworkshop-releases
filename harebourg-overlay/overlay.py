@@ -3,8 +3,8 @@
 
 Tu choisis ta confusion (menu, ou ligne du chat copiée) ou ta tranche de PV ; l'overlay connaît la carte
 de la salle et dessine par-dessus le jeu la case visée par ta souris et la case où le sort atterrit.
-Il ne lit pas l'écran, ne clique pas et ne touche pas aux fichiers du jeu : il lit seulement la position
-de la souris et, quand tu copies une ligne « Confusion … Pi/4 », le presse-papiers.
+Il ne clique pas et ne touche pas aux fichiers du jeu : il lit la position de la souris, le presse-papiers quand
+tu copies une ligne « Confusion … Pi/4 », et une capture de l'écran seulement pour caler la grille (autocal.py).
 """
 import json
 import sys
@@ -15,21 +15,31 @@ from pathlib import Path
 
 import numpy as np
 
-from PyQt6.QtCore import QObject, QPoint, QPointF, QRectF, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QDir, QLocale, QLockFile, QObject, QPoint, QPointF, QRectF, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QBrush, QColor, QCursor, QFont, QGuiApplication, QImage, QLinearGradient, QPainter,
                          QPalette, QPen, QPolygonF)
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                             QLineEdit, QPushButton, QScrollArea, QSlider, QSpinBox, QVBoxLayout, QWidget)
+                             QLineEdit, QMessageBox, QPushButton, QScrollArea, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
 import autocal
 import core
+import i18n
+import safety
 import theme
 import view
+from i18n import _t
 from dial import Dial
 
 # Dossier du programme : à côté du .exe une fois compilé (sinon config.json serait perdu dans un dossier temporaire)
 APP_DIR = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).parent
-CONFIG = APP_DIR / "config.json"
+APP_VERSION = "0.3.0"                     # la même que dans installer.iss et version_info.txt (test_safety.py le vérifie)
+CONFIG = safety.pick_config_path(APP_DIR)
+LOG = CONFIG.with_name("harebourg.log")
+
+
+def report_error():
+    """Écrit l'exception en cours dans le journal (sans le noyer si elle se répète à chaque image)."""
+    safety.ERRORS.report(sys.exc_info(), sys._getframe(1).f_code.co_name)
 DEFAULT_KEYS = {
     "set_me": "<f6>", "clear_me": "<f3>", "conf_next": "<f7>", "new_turn": "<f9>", "hits_plus": "<f10>", "hits_minus": "<f11>",
     "summon": "<f4>", "calibrate": "<f5>", "toggle": "<f8>",
@@ -59,7 +69,7 @@ KEY_HELP = {
 
 def key_label(combo):
     if not combo:
-        return "aucune"
+        return _t("aucune")
     return combo.replace("<", "").replace(">", "").replace("+", " + ").upper()
 
 
@@ -106,7 +116,7 @@ class KeyButton(QPushButton):
     def __init__(self, action, combo):
         super().__init__(key_label(combo))
         self.action, self.combo, self.recording = action, combo, False
-        self.setToolTip("Clique puis appuie sur une touche (ex. F6, Ctrl + F9). Échap = annuler, Suppr = aucune touche")
+        self.setToolTip(_t("Clique puis appuie sur une touche (ex. F6, Ctrl + F9). Échap = annuler, Suppr = aucune touche"))
         self.clicked.connect(self.start)
 
     def set_combo(self, combo):
@@ -117,7 +127,7 @@ class KeyButton(QPushButton):
         self.recording = True
         self.setProperty("rec", "true")
         repolish(self)
-        self.setText("Appuie sur une touche…")
+        self.setText(_t("Appuie sur une touche…"))
         self.started.emit()
         self.grabKeyboard()
 
@@ -214,7 +224,7 @@ class Overlay(QWidget):
 
     def __init__(self, geom):
         flags = (Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint |
-                 Qt.WindowType.Tool | Qt.WindowType.WindowTransparentForInput)
+                 Qt.WindowType.Tool | Qt.WindowType.WindowTransparentForInput | Qt.WindowType.WindowDoesNotAcceptFocus)
         super().__init__(None, flags)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
@@ -264,6 +274,11 @@ class FullscreenTool(QWidget):
         g = e.globalPosition()
         return g.x(), g.y()
 
+    def _rect(self):
+        """L'écran couvert par l'outil, en coordonnées globales : (x, y, largeur, hauteur)."""
+        ox, oy = self._origin()
+        return ox, oy, self.width(), self.height()
+
     def _panel(self, lines):
         ox, oy = self._origin()
         return ("panel", ox + self.width() / 2.0, oy + 10, lines)
@@ -296,14 +311,14 @@ class Calibration(FullscreenTool):
         x : colonne du 2e point (au clic, on fait la moyenne des deux colonnes) ; None = la même que le 1er (aperçu).
         """
         if y <= self.top[1]:
-            self.msg = "Le 2e point doit être plus bas que le 1er."
+            self.msg = _t("Le 2e point doit être plus bas que le 1er.")
             return None
         if x is not None and abs(x - self.top[0]) > self.MAX_DX:
-            self.msg = "Le 2e point doit être juste sous le 1er (la case du milieu, même colonne)."
+            self.msg = _t("Le 2e point doit être juste sous le 1er (la case du milieu, même colonne).")
             return None
         new = core.Calib.from_anchors(self.top, (self.top[0] if x is None else x, y))
         if new is None or not (self.MIN_KY <= new.ky <= self.MAX_KY):
-            self.msg = "Ces deux points sont trop proches ou trop éloignés pour une salle entière."
+            self.msg = _t("Ces deux points sont trop proches ou trop éloignés pour une salle entière.")
             return None
         self.msg = None
         return new
@@ -317,21 +332,21 @@ class Calibration(FullscreenTool):
             anchor = core.CAL_TOP if self.step == 0 else core.CAL_BOTTOM
             prims.append(("poly", c.polygon(anchor), view.ANCHOR_FILL, view.ANCHOR_LINE, 3, False))
             x, y = c.center(anchor)
-            label = "Repère approximatif" if self.step == 0 else "Doit être la case du milieu, en bas"
+            label = _t("Repère approximatif") if self.step == 0 else _t("Doit être la case du milieu, en bas")
             dy = -c.ky * 2.2 if self.step == 0 else c.ky * 2.2
             prims.append(("text", x, y + dy, label, view.ANCHOR_LINE, 13, view.LABEL_BG))
         lines = [
-            [("1/3 · Clique sur le SOL de la case du milieu, tout en HAUT de la salle", view.TEXT),
-             ("Les 3 cases du bord haut : prends celle du milieu. Vise le sol (les pieds), pas le personnage.", view.MUTED)],
-            [("2/3 · Descends la souris : la grille s'étire. Clique quand la case jaune est celle du milieu, tout en BAS", view.TEXT),
-             ("Le contour cyan doit longer le bord du carrelage. Retour arrière ou clic droit = refaire le 1er point.", view.MUTED)],
-            [("3/3 · Fais coller le contour cyan au bord du carrelage (les dents du zigzag), puis Entrée", view.TEXT),
-             ("Glisser = déplacer · molette = taille · flèches = 1 pixel (Maj = 10) · retour arrière = tout refaire", view.MUTED),
-             ("Regarde surtout les pointes à gauche et à droite : c'est là qu'un décalage de côté se voit le mieux.", view.MUTED)],
+            [(_t("1/3 · Clique sur le SOL de la case du milieu, tout en HAUT de la salle"), view.TEXT),
+             (_t("Les 3 cases du bord haut : prends celle du milieu. Vise le sol (les pieds), pas le personnage."), view.MUTED)],
+            [(_t("2/3 · Descends la souris : la grille s'étire. Clique quand la case jaune est celle du milieu, tout en BAS"), view.TEXT),
+             (_t("Le contour cyan doit longer le bord du carrelage. Retour arrière ou clic droit = refaire le 1er point."), view.MUTED)],
+            [(_t("3/3 · Fais coller le contour cyan au bord du carrelage (les dents du zigzag), puis Entrée"), view.TEXT),
+             (_t("Glisser = déplacer · molette = taille · flèches = 1 pixel (Maj = 10) · retour arrière = tout refaire"), view.MUTED),
+             (_t("Regarde surtout les pointes à gauche et à droite : c'est là qu'un décalage de côté se voit le mieux."), view.MUTED)],
         ][self.step]
         if self.msg:
             lines.append((self.msg, view.WARN))
-        lines.append(("Entrée = valider · Échap = annuler" if self.step == 2 else "Échap = annuler", view.MUTED))
+        lines.append((_t("Entrée = valider · Échap = annuler") if self.step == 2 else _t("Échap = annuler"), view.MUTED))
         prims.append(self._panel(lines))
         paint_prims(p, prims, *self._origin())
 
@@ -409,6 +424,72 @@ class Calibration(FullscreenTool):
                 self.update()
 
 
+class FreeCalibration(FullscreenTool):
+    """Calage à la main du mode Songes : une grande grille à faire coller aux carreaux du jeu.
+
+    Glisser = déplacer · molette = taille (autour de la souris) · flèches = 1 pixel (Maj = 10) · Entrée = valider.
+    """
+
+    def __init__(self, geom, calib, fight):
+        super().__init__(geom)
+        self.calib = core.Calib(calib.x0, calib.y0, calib.kx, calib.ky)
+        self.fight = fight
+        self.drag = None
+        self.setCursor(Qt.CursorShape.CrossCursor)
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        p.fillRect(self.rect(), QColor(0, 0, 0, 40))   # pas totalement transparent : sinon les clics passent au travers
+        prims = view.free_grid_prims(self.calib, self._rect(), strong=True)
+        prims.append(self._panel([
+            (_t("Songes : fais coller la grille aux carreaux du jeu, sur tout l'écran"), view.TEXT),
+            (_t("Glisser = déplacer · molette = taille (autour de la souris) · flèches = 1 pixel (Maj = 10)"), view.MUTED),
+            (_t("Règle d'abord la position sur un carreau, puis regarde un carreau tout au bord de l'écran : "
+                "s'il dérive, corrige la taille."), view.MUTED),
+            (_t("Entrée = valider · Échap = annuler"), view.MUTED)]))
+        paint_prims(p, prims, *self._origin())
+
+    def zoom(self, factor, mx, my):
+        """Change la taille de la grille en gardant fixe le point (mx, my)."""
+        c = self.calib
+        c.x0, c.kx = mx - (mx - c.x0) * factor, c.kx * factor
+        c.y0, c.ky = my - (my - c.y0) * factor, c.ky * factor
+        self.update()
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.MouseButton.LeftButton:
+            x, y = self._g(e)
+            self.drag = (x, y, self.calib.x0, self.calib.y0)
+
+    def mouseMoveEvent(self, e):
+        if self.drag:
+            x, y = self._g(e)
+            x1, y1, x0, y0 = self.drag
+            self.calib.x0, self.calib.y0 = x0 + x - x1, y0 + y - y1
+            self.update()
+
+    def mouseReleaseEvent(self, _e):
+        self.drag = None
+
+    def wheelEvent(self, e):
+        g = e.globalPosition()
+        self.zoom(1.02 ** (e.angleDelta().y() / 120.0), g.x(), g.y())
+
+    def keyPressEvent(self, e):
+        k, step = e.key(), (10 if e.modifiers() & Qt.KeyboardModifier.ShiftModifier else 1)
+        if k == Qt.Key.Key_Escape:
+            self.finish(None)
+        elif k in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.finish(self.calib)
+        else:
+            dx = {Qt.Key.Key_Left: -step, Qt.Key.Key_Right: step}.get(k, 0)
+            dy = {Qt.Key.Key_Up: -step, Qt.Key.Key_Down: step}.get(k, 0)
+            if dx or dy:
+                self.calib.x0 += dx
+                self.calib.y0 += dy
+                self.update()
+
+
 class PlacePicker(FullscreenTool):
     """Clique sur ta case : la grille s'affiche, la case survolée est surlignée."""
 
@@ -423,31 +504,31 @@ class PlacePicker(FullscreenTool):
         p = QPainter(self)
         p.fillRect(self.rect(), QColor(0, 0, 0, 30))
         c, f = self.calib, core.FIGHTS[self.fight]
-        prims = view.grid_prims(c, f)
+        prims = view.grid_prims(c, f, rect=self._rect())
         if self.you is not None:
             prims.append(("poly", c.polygon(self.you), view.YOU_FILL, view.YOU_LINE, 2, False))
         if self.hover is not None:
             ok = core.is_free(f, self.hover)
             prims.append(("poly", c.polygon(self.hover), view.AIM_FILL if ok else None,
                           view.AIM_LINE if ok else view.WARN, 3, False))
-        lines = [("Clique sur la case de ton personnage", view.TEXT), ("Échap = annuler", view.MUTED)]
+        lines = [(_t("Clique sur la case de ton personnage"), view.TEXT), (_t("Échap = annuler"), view.MUTED)]
         if self.msg:
             lines.insert(1, (self.msg, view.WARN))
         prims.append(self._panel(lines))
         paint_prims(p, prims, *self._origin())
 
     def mouseMoveEvent(self, e):
-        cell = self.calib.cell_at(*self._g(e))
+        cell = self.calib.cell_at(*self._g(e), free=core.FIGHTS[self.fight].free)
         if cell != self.hover:
             self.hover = cell
             self.update()
 
     def click(self, x, y):
-        cell = self.calib.cell_at(x, y)
+        cell = self.calib.cell_at(x, y, free=core.FIGHTS[self.fight].free)
         if cell is None:
-            self.msg = "Hors de la salle (si la grille est décalée, calibre-la d'abord)"
+            self.msg = _t("Hors de la salle (si la grille est décalée, calibre-la d'abord)")
         elif not core.is_free(core.FIGHTS[self.fight], cell):
-            self.msg = "Cette case est un bloc ou un trou"
+            self.msg = _t("Cette case est un bloc ou un trou")
         else:
             self.finish(cell)
             return
@@ -672,7 +753,13 @@ class Controller(QObject):
         super().__init__()
         self.app = app
         self._apply_theme(app)
-        self.cfg = self._load()
+        self.raw_cfg = self._load()
+        self.cfg = safety.sanitize_config(self.raw_cfg, len(core.FIGHTS), DEFAULT_KEYS, i18n.LANGS)   # jamais bloquant
+        code = self.cfg.get("lang")
+        if code not in i18n.LANGS:       # pas encore choisie : français pour une ancienne config, sinon la langue du système
+            code = "fr" if self.raw_cfg else i18n.detect(QLocale.system().name())
+        self.lang = code
+        i18n.set_lang(code)
         saved_keys = {k: v for k, v in self.cfg.get("hotkeys", {}).items() if k in DEFAULT_KEYS}
         self.keys = {**DEFAULT_KEYS, **saved_keys}
         self.screens = QGuiApplication.screens()
@@ -686,8 +773,9 @@ class Controller(QObject):
         else:
             cal = self._default_calib(g)
         self.state = view.State(
-            calib=cal, screen_w=g.width(), origin=(g.x(), g.y()), fight=self.cfg.get("fight", 0),
+            calib=cal, screen_w=g.width(), screen_h=g.height(), origin=(g.x(), g.y()), fight=self.cfg.get("fight", 0),
             hp_manual=float(self.cfg.get("hp_manual", 100)), show_grid=self.cfg.get("show_grid", False))
+        self.auto_calage = bool(self.cfg.get("auto_calage", True))     # calage automatique de la grille : décochable
         self.collapsed = dict(self.cfg.get("collapsed", {}))
         self.mini = bool(self.cfg.get("mini", False))     # mode mini : seule la ligne de rotation reste
         size = self.cfg.get("panel_size")                  # taille choisie en tirant les bords (hors mode mini)
@@ -695,6 +783,7 @@ class Controller(QObject):
         self._normal_w = max(320, int(size[0])) if ok else 363
         self._normal_h = max(110, int(size[1])) if ok else None
         self._accel = (0.0, None, 0)
+        self._save_failed = False
         self.pool = ThreadPoolExecutor(max_workers=1)      # le calage automatique tourne là, pour ne pas figer l'écran
         self._autocal = None            # calage en cours : [résultat à venir, pixels par point, manuel ?, actions ensuite]
         self._msg = None                # message affiché un instant dans la fenêtre : (texte, est-ce un problème ?)
@@ -775,8 +864,8 @@ class Controller(QObject):
         self.key_btns[action].set_combo(combo)
         single = bool(combo) and "+" not in combo and not combo.startswith("<")
         self.lbl_key_warn.setText(
-            f"Attention : « {key_label(combo)} » seule marchera aussi quand tu écris dans le chat. "
-            "Préfère une touche F ou Ctrl + touche." if single else "")
+            _t("Attention : « {key} » seule marchera aussi quand tu écris dans le chat. "
+               "Préfère une touche F ou Ctrl + touche.").format(key=key_label(combo)) if single else "")
         self.start_hotkeys()
         self.save()
         self.refresh()
@@ -790,10 +879,7 @@ class Controller(QObject):
         return cal
 
     def _load(self):
-        try:
-            return json.loads(CONFIG.read_text(encoding="utf-8"))
-        except Exception:
-            return {}
+        return safety.load_config(CONFIG)
 
     def save(self):
         c = self.state.calib
@@ -801,7 +887,7 @@ class Controller(QObject):
             "calib": {"x0": c.x0, "y0": c.y0, "kx": c.kx, "ky": c.ky}, "calib_screen": self.screen_idx,
             "screen": self.screen_idx, "fight": self.state.fight, "hp_manual": self.state.hp_manual,
             "show_grid": self.state.show_grid, "hotkeys": self.keys,
-            "collapsed": self.collapsed, "mini": self.mini,
+            "collapsed": self.collapsed, "mini": self.mini, "auto_calage": self.auto_calage, "lang": self.lang,
             "panel_opacity": self.panel_opacity, "draw_opacity": self.draw_opacity,
         }
         if getattr(self, "panel", None) is not None:
@@ -809,9 +895,13 @@ class Controller(QObject):
             if self._normal_h is not None:
                 self.cfg["panel_size"] = [self._normal_w, self._normal_h]
         try:
-            CONFIG.write_text(json.dumps(self.cfg, indent=2), encoding="utf-8")
+            safety.write_json_atomic(CONFIG, self.cfg)
+            self._save_failed = False
         except Exception:
-            pass
+            report_error()
+            if not self._save_failed and getattr(self, "lbl", None) is not None:       # on ne prévient qu'une fois
+                self._save_failed = True
+                self._say(_t("Impossible d'enregistrer les réglages (dossier protégé ?). Ils ne seront pas gardés."), bad=True)
 
     # -- fenêtre de contrôle
     def _build_panel(self):
@@ -860,7 +950,7 @@ class Controller(QObject):
         self.btn_all.clicked.connect(self.toggle_all)
         b_close = QPushButton("×")
         b_close.setObjectName("tiny")
-        b_close.setToolTip("Fermer l'overlay")
+        b_close.setToolTip(_t("Fermer l'overlay"))
         b_close.clicked.connect(w.close)
         side.addWidget(self.btn_all)
         side.addWidget(b_close)
@@ -899,18 +989,18 @@ class Controller(QObject):
             return lab
 
         # 1. Confusion
-        s = section("conf", "Confusion", False)
+        s = section("conf", _t("Confusion"), False)
         self.cb_conf = QComboBox()
-        self.cb_conf.addItems([label for _, label in core.CONF_CHOICES])
+        self.cb_conf.addItems([_t(label) for _, label in core.CONF_CHOICES])
         self.cb_conf.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.cb_conf.setMinimumContentsLength(26)
-        self.cb_conf.setToolTip("Le jeu écrit la rotation de deux façons : « horaire 2 Pi/4 » = « contre horaire 6 Pi/4 »,\n"
-                                "« horaire 6 Pi/4 » = « contre horaire 2 Pi/4 ». Les deux donnent le même résultat.")
+        self.cb_conf.setToolTip(_t("Le jeu écrit la rotation de deux façons : « horaire 2 Pi/4 » = « contre horaire 6 Pi/4 »,\n"
+                                   "« horaire 6 Pi/4 » = « contre horaire 2 Pi/4 ». Les deux donnent le même résultat."))
         self.cb_conf.currentIndexChanged.connect(self.on_conf_index)
         s.add(self.cb_conf)
         self.ed_paste = QLineEdit()
-        self.ed_paste.setPlaceholderText("Colle ici la ligne de confusion")
-        self.ed_paste.setToolTip("Colle « Confusion horaire : 2 Pi/4 » (la copier dans le chat suffit, c'est automatique)")
+        self.ed_paste.setPlaceholderText(_t("Colle ici la ligne de confusion"))
+        self.ed_paste.setToolTip(_t("Colle « Confusion horaire : 2 Pi/4 » (la copier dans le chat suffit, c'est automatique)"))
         self.ed_paste.textChanged.connect(self.on_paste_text)
         s.add(self.ed_paste)
         self.lbl_paste = note("")
@@ -918,7 +1008,7 @@ class Controller(QObject):
         s.add(self.lbl_paste)
 
         # 2. Tour : lignes au corps à corps, nouveau tour, invocation
-        s = section("turn", "Tour", False)
+        s = section("turn", _t("Tour"), False)
         b_minus, b_plus = QPushButton("−"), QPushButton("+")
         for b in (b_minus, b_plus):
             b.setFixedWidth(34)
@@ -928,89 +1018,99 @@ class Controller(QObject):
         self.lbl_hits.setStyleSheet(f"background:#04191a; border:1px solid {theme.TEAL_EDGE}; border-radius:8px; padding:4px 0;")
         b_minus.clicked.connect(lambda: self.add_hits(-1))
         b_plus.clicked.connect(lambda: self.add_hits(1))
-        hits_label = QLabel("Lignes càc")
-        hits_label.setToolTip("Lignes de dégâts que tu infliges au corps à corps ce tour")
+        hits_label = QLabel(_t("Lignes càc"))
+        hits_label.setToolTip(_t("Lignes de dégâts que tu infliges au corps à corps ce tour"))
         s.row(hits_label, b_minus, self.lbl_hits, b_plus)
-        b_turn = QPushButton("Nouveau tour")
+        b_turn = QPushButton(_t("Nouveau tour"))
         b_turn.setObjectName("primary")
-        b_turn.setToolTip("Lignes à 0, confusion à rechoisir")
+        b_turn.setToolTip(_t("Lignes à 0, confusion à rechoisir"))
         b_turn.clicked.connect(self.new_turn)
         s.add(b_turn)
-        self.ck_summon = QCheckBox("Invocation (aucune confusion)")
+        self.ck_summon = QCheckBox(_t("Invocation (aucune confusion)"))
         self.ck_summon.toggled.connect(self.set_summon)
         s.add(self.ck_summon)
 
         # 3. PV (utilisés seulement si aucune confusion n'est choisie)
-        s = section("pv", "PV", True)
-        s.add(note("Utilisés seulement si aucune confusion n'est choisie."))
+        s = section("pv", _t("PV"), True)
+        s.add(note(_t("Utilisés seulement si aucune confusion n'est choisie.")))
         self.sp_hp = QSpinBox()
         self.sp_hp.setRange(0, 100)
         self.sp_hp.setSuffix(" %")
         self.sp_hp.setValue(int(self.state.hp_manual))
         self.sp_hp.valueChanged.connect(self.set_hp_manual)
-        s.row(QLabel("PV à la main"), self.sp_hp)
+        s.row(QLabel(_t("PV à la main")), self.sp_hp)
         self.tranche_btns = []
         for tr in core.TRANCHES:
             b = QPushButton(f"{tr.hi}–{tr.lo}")
-            b.setToolTip(f"{tr.hi} % à {tr.lo} % : {tr.name}")
+            b.setToolTip(_t("{hi} % à {lo} % : {name}").format(hi=tr.hi, lo=tr.lo, name=_t(tr.name)))
             b.clicked.connect(lambda _=False, tr=tr: self.pick_tranche(tr))
             self.tranche_btns.append(b)
         s.row(*self.tranche_btns)
 
         # 4. Position
-        s = section("pos", "Position", True)
-        b_me = QPushButton("Me placer (clic)")
+        s = section("pos", _t("Position"), True)
+        b_me = QPushButton(_t("Me placer (clic)"))
         b_me.clicked.connect(self.open_place)
-        b_clr = QPushButton("Retirer")
-        b_clr.setToolTip("Efface ta case et les traits pendant que tu te déplaces ; replace-toi ensuite")
+        b_clr = QPushButton(_t("Retirer"))
+        b_clr.setToolTip(_t("Efface ta case et les traits pendant que tu te déplaces ; replace-toi ensuite"))
         b_clr.clicked.connect(self.clear_me)
         s.row(b_me, b_clr)
 
         # 5. Affichage
-        s = section("look", "Affichage", True)
+        s = section("look", _t("Affichage"), True)
         self.sl_panel = QSlider(Qt.Orientation.Horizontal)
         self.sl_panel.setRange(20, 100)
         self.sl_panel.setValue(self.panel_opacity)
         self.sl_panel.valueChanged.connect(self.set_panel_opacity)
         self.lbl_panel_op = QLabel(f"{self.panel_opacity} %")
-        s.row(QLabel("Fenêtre"), self.sl_panel, self.lbl_panel_op)
+        s.row(QLabel(_t("Fenêtre")), self.sl_panel, self.lbl_panel_op)
         self.sl_draw = QSlider(Qt.Orientation.Horizontal)
         self.sl_draw.setRange(10, 100)
         self.sl_draw.setValue(self.draw_opacity)
         self.sl_draw.valueChanged.connect(self.set_draw_opacity)
         self.lbl_draw_op = QLabel(f"{self.draw_opacity} %")
-        s.row(QLabel("Dessins"), self.sl_draw, self.lbl_draw_op)
-        self.ck_grid = QCheckBox("Grille")
+        s.row(QLabel(_t("Dessins")), self.sl_draw, self.lbl_draw_op)
+        self.ck_grid = QCheckBox(_t("Grille"))
         self.ck_grid.setChecked(self.state.show_grid)
         self.ck_grid.toggled.connect(self.set_grid)
         s.add(self.ck_grid)
 
         # 6. Réglages
-        s = section("setup", "Réglages", True)
-        b_cal = QPushButton("Calibrer la grille")
-        b_cal.setToolTip("Retrouve la salle sur ton écran et cale la grille toute seule")
-        b_cal.clicked.connect(self.calibrate_auto)
-        b_hand = QPushButton("À la main…")
-        b_hand.setToolTip("Calibration en 2 clics, si le calage automatique ne marche pas")
-        b_hand.clicked.connect(self.open_calibration)
-        s.row(b_cal, b_hand)
-        s.add(note("La grille se cale toute seule quand tu fais « Me placer » (et au lancement). "
-                   "Ouvre ton combat d'abord."))
+        s = section("setup", _t("Réglages"), True)
+        self.btn_cal = QPushButton(_t("Calibrer la grille"))
+        self.btn_cal.clicked.connect(self.calibrate_auto)
+        self.btn_hand = QPushButton(_t("À la main…"))
+        self.btn_hand.setToolTip(_t("Calibration en 2 clics, si le calage automatique ne marche pas"))
+        self.btn_hand.clicked.connect(self.open_calibration)
+        s.row(self.btn_cal, self.btn_hand)
+        self.ck_auto = QCheckBox(_t("Calage automatique (au lancement et à « Me placer »)"))
+        self.ck_auto.setToolTip(_t("Décoche-la si la grille bouge trop quand tu te places : « Calibrer la grille » reste disponible"))
+        self.ck_auto.setChecked(self.auto_calage)
+        self.ck_auto.toggled.connect(self.set_auto_calage)
+        s.add(self.ck_auto)
+        self.lbl_cal_note = note("")
+        s.add(self.lbl_cal_note)
         self.cb_fight = QComboBox()
-        self.cb_fight.addItems([f.name for f in core.FIGHTS])
+        self.cb_fight.addItems([_t(f.name) for f in core.FIGHTS])
         self.cb_fight.setCurrentIndex(self.state.fight)
         self.cb_fight.currentIndexChanged.connect(self.set_fight)
-        s.row(QLabel("Combat"), self.cb_fight)
+        s.row(QLabel(_t("Combat")), self.cb_fight)
+        self._update_free_ui()
         self.cb_screen = QComboBox()
-        self.cb_screen.addItems([f"Écran {i + 1} ({sc.geometry().width()}×{sc.geometry().height()})"
+        self.cb_screen.addItems([_t("Écran {n} ({w}×{h})").format(n=i + 1, w=sc.geometry().width(), h=sc.geometry().height())
                                  for i, sc in enumerate(self.screens)])
         self.cb_screen.setCurrentIndex(self.screen_idx)
         self.cb_screen.currentIndexChanged.connect(self.set_screen)
-        s.row(QLabel("Écran"), self.cb_screen)
+        s.row(QLabel(_t("Écran")), self.cb_screen)
+        self.cb_lang = QComboBox()                      # volontairement dans les deux langues : on doit le retrouver
+        self.cb_lang.addItems(list(i18n.LANGS.values()))
+        self.cb_lang.setCurrentIndex(list(i18n.LANGS).index(self.lang))
+        self.cb_lang.currentIndexChanged.connect(self.set_language)
+        s.row(QLabel("Langue / Language"), self.cb_lang)
 
         # 7. Raccourcis
-        s = section("keys", "Raccourcis", True)
-        s.add(note("Clique une touche, puis appuie sur la nouvelle."))
+        s = section("keys", _t("Raccourcis"), True)
+        s.add(note(_t("Clique une touche, puis appuie sur la nouvelle.")))
         grid = QGridLayout()
         grid.setSpacing(5)
         self.key_btns = {}
@@ -1020,7 +1120,7 @@ class Controller(QObject):
             b.captured.connect(self.set_key)
             b.setMinimumWidth(104)
             self.key_btns[n] = b
-            lab = QLabel(KEY_HELP[n])
+            lab = QLabel(_t(KEY_HELP[n]))
             lab.setWordWrap(True)
             lab.setMaximumWidth(185)
             grid.addWidget(b, i, 0)
@@ -1117,7 +1217,7 @@ class Controller(QObject):
         """Pose le centre de la case la plus proche de la grille exactement sous la souris."""
         mx, my = self._mouse_pos()
         c = self.state.calib
-        cell = c.cell_at(mx, my)
+        cell = self.state.cell_at(mx, my)
         if cell is None:
             return
         cx, cy = c.center(cell)
@@ -1169,8 +1269,8 @@ class Controller(QObject):
         px = 17 if self.mini else 22
         self.lbl_rot.setStyleSheet(f"font-size:{px}px; font-weight:700; color:{theme.CREAM};")
         self.btn_all.setText("+" if self.mini else "–")
-        self.btn_all.setToolTip("Tout réafficher" if self.mini else
-                                "Mode mini : ne garder que le cadran et la rotation")
+        self.btn_all.setToolTip(_t("Tout réafficher") if self.mini else
+                                _t("Mode mini : ne garder que le cadran et la rotation"))
         if getattr(self, "panel", None) is not None:
             self._layout_panel()
 
@@ -1199,14 +1299,55 @@ class Controller(QObject):
             setattr(self.state, k, v)
         self.refresh()
 
+    def _is_free(self):
+        """Mode Songes : grille libre, jamais recalée toute seule."""
+        return core.FIGHTS[self.state.fight].free
+
+    def _update_free_ui(self):
+        """Textes et boutons de la fenêtre qui changent selon le mode (combat du Comte ou Songes)."""
+        free = self._is_free()
+        if free:
+            note_text = _t("Mode Songes : la grille ne se recale jamais toute seule et garde sa taille. « Calibrer la grille » "
+                           "ouvre le calage à la main : fais coller la grille aux carreaux du jeu.")
+        elif not self.auto_calage:
+            note_text = _t("Calage automatique désactivé : la grille ne bouge que si tu cliques sur « Calibrer la grille ».")
+        else:
+            note_text = _t("La grille se cale toute seule quand tu fais « Me placer » (et au lancement). Ouvre ton combat d'abord.")
+        self.lbl_cal_note.setText(note_text)
+        self.ck_auto.setEnabled(not free)
+        self.btn_cal.setToolTip(_t("Ouvre le calage à la main de la grille libre") if free else
+                                _t("Retrouve la salle sur ton écran et cale la grille toute seule"))
+        self.btn_hand.setEnabled(not free)
+        self.ck_grid.setEnabled(not free)
+        self.ck_grid.setToolTip(_t("Toujours affichée en mode Songes") if free else "")
+
+    def set_language(self, i):
+        """Change la langue : elle est enregistrée et s'applique au prochain démarrage."""
+        code = list(i18n.LANGS)[i]
+        if code == self.lang:
+            return
+        self.lang = code
+        self.save()
+        self._say("Langue enregistrée. Redémarre l'overlay pour l'appliquer. / "
+                  "Language saved. Restart the overlay to apply it.")
+
+    def set_auto_calage(self, on):
+        self.auto_calage = bool(on)
+        self._update_free_ui()
+        self.save()
+
     def set_fight(self, i):
         self._set(fight=i)
+        self._update_free_ui()
+        if self._is_free():
+            self._say(_t("Mode Songes : grande grille libre, jamais recalée toute seule."))
         self.save()
 
     def set_screen(self, i):
         self.screen_idx = i
         g = self.screens[i].geometry()
         self.state.calib, self.state.screen_w = self._default_calib(g), g.width()
+        self.state.screen_h = g.height()
         self.state.origin = (g.x(), g.y())
         self.overlay.close()
         self.overlay = Overlay(g)
@@ -1264,7 +1405,8 @@ class Controller(QObject):
             return
         k = core.parse_confusion(text, strict=False)
         if k is None:
-            self._paste_note("<span style='color:" + theme.WARN + "'>Ligne non reconnue (ex. « Confusion horaire : 2 Pi/4 »)</span>")
+            self._paste_note("<span style='color:" + theme.WARN + "'>"
+                             + _t("Ligne non reconnue (ex. « Confusion horaire : 2 Pi/4 »)") + "</span>")
         else:
             self.apply_pasted(k)
 
@@ -1272,6 +1414,8 @@ class Controller(QObject):
         """Une ligne de confusion copiée n'importe où (le chat du jeu) est prise tout de suite."""
         try:
             text = QGuiApplication.clipboard().text()
+            if not text or len(text) > 5000:               # une ligne de chat est courte : on ignore documents, etc.
+                return
             k = core.parse_confusion(text)
             if k is not None:
                 self.ed_paste.blockSignals(True)
@@ -1279,14 +1423,14 @@ class Controller(QObject):
                 self.ed_paste.blockSignals(False)
                 self.apply_pasted(k)
         except Exception:
-            traceback.print_exc()
+            report_error()
 
     def new_turn(self):
         self.ed_paste.blockSignals(True)
         self.ed_paste.clear()
         self.ed_paste.blockSignals(False)
         self.set_choice_index(0)
-        self._paste_note("Nouveau tour : choisis ou copie ta nouvelle confusion")
+        self._paste_note(_t("Nouveau tour : choisis ou copie ta nouvelle confusion"))
 
     # -- placement
     def place_at_mouse(self):
@@ -1296,7 +1440,7 @@ class Controller(QObject):
         self.start_autocal(then=lambda: self._place_at(mx, my))       # on te replace si la grille a bougé
 
     def _place_at(self, x, y):
-        cell = self.state.calib.cell_at(x, y)
+        cell = self.state.cell_at(x, y)
         if cell is not None:
             self._set(you=cell, you_cleared=False)
 
@@ -1319,6 +1463,12 @@ class Controller(QObject):
 
     def start_autocal(self, manual=False, then=None):
         """Lance le calage automatique en arrière-plan. `then` : à refaire quand la grille a été corrigée."""
+        if self._is_free():                                # Songes : pas de carte connue, la grille garde sa taille
+            if manual:
+                self.open_calibration()
+            return
+        if not manual and not self.auto_calage:            # case « Calage automatique » décochée
+            return
         if self._autocal is not None:                      # déjà en cours : on s'y raccroche
             if then is not None:
                 self._autocal[3].append(then)
@@ -1327,40 +1477,45 @@ class Controller(QObject):
         try:
             arr, scale = self.grab_screen()
         except Exception:
-            traceback.print_exc()
+            report_error()
             return
         if arr is None:
             if manual:
-                self._say("Impossible de capturer l'écran.", bad=True)
+                self._say(_t("Impossible de capturer l'écran."), bad=True)
             return
         g, c = self.screens[self.screen_idx].geometry(), self.state.calib
         hint = ((c.x0 - g.x()) * scale, (c.y0 - g.y()) * scale, c.kx * scale)       # la grille actuelle, en pixels de la capture
         self._autocal = [self.pool.submit(autocal.find, arr, hint), scale, manual, [then] if then else []]
         if manual:
-            self._say("Recherche de la salle sur ton écran…")
+            self._say(_t("Recherche de la salle sur ton écran…"))
 
     def _autocal_done(self):
         fut, scale, manual, thens = self._autocal
         self._autocal = None
+        if self._is_free() or (not manual and not self.auto_calage):    # Songes ou case décochée pendant le calcul : on jette le résultat
+            for action in thens:
+                action()
+            self.refresh()
+            return
         try:
             fit = fut.result()
         except Exception:
-            traceback.print_exc()
+            report_error()
             fit = None
         g, c = self.screens[self.screen_idx].geometry(), self.state.calib
         if fit is not None and fit.confident:
             x0, y0, kx = g.x() + fit.x0 / scale, g.y() + fit.y0 / scale, fit.kx / scale
             if max(abs(x0 - c.x0), abs(y0 - c.y0)) > 3.0 or abs(kx / c.kx - 1) > 0.012:
                 c.x0, c.y0, c.kx, c.ky = x0, y0, kx, kx / 2        # sur place : les outils ouverts voient aussi le changement
-                self._say("Grille calée automatiquement.")
+                self._say(_t("Grille calée automatiquement."))
                 self._flash()
                 self._pos_timer.start()                             # enregistre la nouvelle calibration
             elif manual:
-                self._say("La grille est déjà bien calée.")
+                self._say(_t("La grille est déjà bien calée."))
                 self._flash()
         elif manual:
-            self._say("Salle non reconnue sur cet écran. Ouvre ton combat (jeu en fenêtre, sur l'écran choisi dans "
-                      "Réglages), ou calibre à la main.", bad=True)
+            self._say(_t("Salle non reconnue sur cet écran. Ouvre ton combat (jeu en fenêtre, sur l'écran choisi dans "
+                         "Réglages), ou calibre à la main."), bad=True)
             self.open_calibration()
         for action in thens:
             action()
@@ -1423,16 +1578,21 @@ class Controller(QObject):
                 if self.state.no_confusion != new:
                     self.set_summon(new)
         except Exception:
-            traceback.print_exc()
+            report_error()
 
     # -- fenêtres interactives
     def _open_tool(self, tool, on_done):
         if self.tool is not None:
             return
         self.tool = tool
-        self.tool.done.connect(on_done)
-        self.overlay.hide()            # l'outil montre déjà la grille : pas de double affichage
-        self.tool.open()
+        try:
+            self.tool.done.connect(on_done)
+            self.overlay.hide()        # l'outil montre déjà la grille : pas de double affichage
+            self.tool.open()
+        except Exception:
+            report_error()
+            self.tool = None
+            self.overlay.show()
 
     def _tool_closed(self):
         self.tool = None
@@ -1441,7 +1601,8 @@ class Controller(QObject):
 
     def open_calibration(self):
         g = self.screens[self.screen_idx].geometry()
-        self._open_tool(Calibration(g, self.state.calib, self.state.fight), self._calibration_done)
+        tool = FreeCalibration if self._is_free() else Calibration
+        self._open_tool(tool(g, self.state.calib, self.state.fight), self._calibration_done)
 
     def _calibration_done(self, cal):
         if cal is not None:
@@ -1468,13 +1629,13 @@ class Controller(QObject):
             c = s.calib
             if self._autocal is not None and self._autocal[0].done():
                 self._autocal_done()
-            sig = (c.cell_at(*s.mouse), s.you, s.hp_manual, s.hits, s.fight, s.show_grid, s.flash,
+            sig = (s.cell_at(*s.mouse), s.you, s.hp_manual, s.hits, s.fight, s.show_grid, s.flash,
                    s.rotation(), self.overlay_on, c.x0, c.y0, c.kx, c.ky)
             if sig != self.last_sig:
                 self.refresh()
                 self.last_sig = sig
         except Exception:
-            traceback.print_exc()
+            report_error()
 
     def refresh(self):
         self.last_sig = None
@@ -1489,52 +1650,91 @@ class Controller(QObject):
         k, source = s.rotation()
         label = core.total_label(k)
         self.lbl_rot.setText(label[0].upper() + label[1:])
-        origin = {"invocation": "Invocation", "choisie": "Confusion choisie", "pv": f"PV {s.hp_manual:.0f} %"}[source]
-        self.lbl_src.setText(origin + (f" · {s.hits} càc" if s.hits else ""))
+        origin = {"invocation": _t("Invocation"), "choisie": _t("Confusion choisie"),
+                  "pv": _t("PV {pv} %").format(pv=f"{s.hp_manual:.0f}")}[source]
+        self.lbl_src.setText(origin + (_t(" · {n} càc").format(n=s.hits) if s.hits else ""))
 
         def dot(color):
             return f"<span style='color:{color}'>●</span>"
 
         set_me = key_label(self.keys["set_me"])
         if s.you is None and s.you_cleared:
-            parts = [f"{dot(theme.AMBER)} Déplacement · <b>{set_me}</b> sur ta case"]
+            parts = [dot(theme.AMBER) + " " + _t("Déplacement · <b>{key}</b> sur ta case").format(key=set_me)]
         elif s.you is None:
-            parts = [f"{dot(theme.AMBER)} À placer · <b>{set_me}</b> sur ta case"]
+            parts = [dot(theme.AMBER) + " " + _t("À placer · <b>{key}</b> sur ta case").format(key=set_me)]
         else:
-            parts = [f"{dot(theme.CYAN)} Placé · case {s.you[0]},{s.you[1]}"]
+            parts = [dot(theme.CYAN) + " " + _t("Placé · case {a},{b}").format(a=s.you[0], b=s.you[1])]
         if self._msg:
             text, bad = self._msg
             parts.append(f"<span style='color:{theme.WARN if bad else theme.CYAN_SOFT}'>{text}</span>")
         if self.hotkeys is not None and self.hotkeys.error:
-            parts.append(f"<span style='color:{theme.WARN}'>Raccourcis indisponibles ({self.hotkeys.error})</span>")
+            parts.append(f"<span style='color:{theme.WARN}'>"
+                         + _t("Raccourcis indisponibles ({err})").format(err=self.hotkeys.error) + "</span>")
         self.lbl.setText("<br>".join(parts))
         self.dial.set_info(view.dial_info(s))
 
     def quit(self):
+        try:
+            self.save()
+        except Exception:
+            report_error()
         if self.hotkeys is not None:
             self.hotkeys.stop()
         self.pool.shutdown(wait=False, cancel_futures=True)
         self.app.quit()
 
 
+def _selftest():
+    """Contrôle d'une version compilée : le calage, les langues et le nettoyage des réglages fonctionnent."""
+    ok = autocal.selftest()
+    try:
+        i18n.set_lang("en")
+        ok = ok and i18n._t("Réglages") == "Settings" and core.parse_confusion("Confusion counter clockwise : 2 Pi/4") == 3
+    finally:
+        i18n.set_lang("fr")
+    return bool(ok and safety.sanitize_config({"fight": 99, "lang": [1]}, 5, {}, i18n.LANGS) == {})
+
+
 def main():
-    if len(sys.argv) >= 3 and sys.argv[1] == "--selftest":      # contrôle d'une version compilée, sans fenêtre
-        Path(sys.argv[2]).write_text("OK" if autocal.selftest() else "ECHEC", encoding="utf-8")
+    args = sys.argv[1:]
+    if len(args) >= 2 and args[0] == "--selftest":             # contrôle d'une version compilée, sans fenêtre
+        Path(args[1]).write_text("OK" if _selftest() else "ECHEC", encoding="utf-8")
         return
-    # Exe sans console : les erreurs vont dans harebourg.log, à côté du programme.
-    if sys.stderr is None or sys.stdout is None:
+    safety.rotate_log(LOG)
+    if sys.stderr is None or sys.stdout is None:               # exe sans console : les erreurs vont dans harebourg.log
         try:
-            log = open(APP_DIR / "harebourg.log", "a", encoding="utf-8", buffering=1)
+            log = open(LOG, "a", encoding="utf-8", buffering=1)
         except OSError:
             import io
             log = io.StringIO()
         sys.stderr = sys.stderr or log
         sys.stdout = sys.stdout or log
-    # Une exception dans un slot PyQt6 fait planter tout le programme : on l'affiche et on continue.
-    sys.excepthook = lambda *a: traceback.print_exception(*a)
-    app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
-    ctl = Controller(app)   # noqa: F841  (doit rester référencé)
+    # Une exception dans un slot PyQt6 ferait planter tout le programme : on l'écrit dans le journal et on continue.
+    sys.excepthook = lambda et, ev, tb: safety.ERRORS.report((et, ev, tb), "non rattrapée")
+    if args and args[0] == "--diagnose":                       # rapport à lancer pendant un combat (voir diagnostic.py)
+        import diagnostic
+        raw = safety.load_config(CONFIG)
+        i18n.set_lang(raw.get("lang") if raw.get("lang") in i18n.LANGS else "fr")
+        sane = safety.sanitize_config(raw, len(core.FIGHTS), DEFAULT_KEYS, i18n.LANGS)
+        diagnostic.run(args[1:], APP_VERSION, CONFIG, raw, sane)
+        return
+    try:
+        app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(False)
+        lock = QLockFile(QDir.tempPath() + "/harebourg-overlay.lock")      # une seule instance à la fois
+        if not lock.tryLock(0):
+            QMessageBox.information(None, "Harebourg Overlay", "Harebourg Overlay est déjà lancé. / "
+                                    "Harebourg Overlay is already running.")
+            return
+        ctl = Controller(app)   # noqa: F841  (doit rester référencé)
+    except Exception:
+        report_error()
+        try:
+            QMessageBox.critical(None, "Harebourg Overlay", "Harebourg Overlay n'a pas pu démarrer. / "
+                                 f"Harebourg Overlay could not start.\n{LOG}")
+        except Exception:
+            pass
+        sys.exit(1)
     sys.exit(app.exec())
 
 

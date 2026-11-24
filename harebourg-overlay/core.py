@@ -12,6 +12,8 @@ import math
 import re
 from dataclasses import dataclass
 
+from i18n import _t
+
 # Pour chaque ligne a, les colonnes vont de -m à +m de 2 en 2.
 EXT = {
     -2: 2, -1: 5, 0: 8, 1: 9, 2: 10, 3: 11, 4: 10, 5: 11, 6: 12, 7: 11, 8: 12,
@@ -81,6 +83,7 @@ class Fight:
     blocks: frozenset   # cases qui bloquent la ligne de vue
     pits: frozenset     # trous
     block_groups: tuple  # les mêmes blocs, regroupés (pour le dessin)
+    free: bool = False   # mode Songes : pas de carte connue, une grande grille libre sans obstacles
 
 
 FIGHTS = [
@@ -88,6 +91,9 @@ FIGHTS = [
           tuple(tuple(_cells(g)) for g in bl))
     for n, bl, pt in _RAW_FIGHTS
 ]
+# Mode « Songes » : la salle change à chaque fois et on ne la connaît pas. On ne dessine donc aucune carte :
+# juste une grande grille qui couvre l'écran, sans murs, sans trous et sans limite de salle.
+FIGHTS.append(Fight("Songes (grille libre)", frozenset(), frozenset(), (), free=True))
 
 
 # --- Tranches de vitalité ---------------------------------------------------------
@@ -128,7 +134,7 @@ def quarter_turns(pct, hits):
 
 
 def total_label(k):
-    return {0: "aucune rotation", 1: "90° horaire", 2: "180°", 3: "90° anti-horaire"}[k % 4]
+    return _t({0: "aucune rotation", 1: "90° horaire", 2: "180°", 3: "90° anti-horaire"}[k % 4])
 
 
 # --- Confusion choisie ou copiée -----------------------------------------------------
@@ -141,29 +147,36 @@ CONF_CHOICES = [
     (0, "Confusion 0 Pi/4 → aucune rotation"),
 ]
 
-# Ligne du chat de combat : « Confusion horaire : 2 Pi/4 », « Confusion contre horaire : 6 Pi/4 ».
-_CONF = re.compile(
-    r"c[o0]nf[uv]s[il1][o0]n\s*((?:c[o0]ntr[e3]|anti)[\s\-]*)?h[o0]ra[il1|!]r[e3]"
-    r"\s*[:.;]?\s*(\d+)\s*(?:pi|p[il1]|π)\s*/\s*(\d+)", re.I)
+# Lignes du chat de combat : « Confusion horaire : 2 Pi/4 », « Confusion contre horaire : 6 Pi/4 » (client français) ;
+# « Confusion clockwise : 2 Pi/4 », « Confusion counter clockwise : 6 Pi/4 » (client anglais : formes probables, non vérifiées).
+_CONF_PATTERNS = [
+    re.compile(
+        r"c[o0]nf[uv]s[il1][o0]n\s*((?:c[o0]ntr[e3]|anti)[\s\-]*)?h[o0]ra[il1|!]r[e3]"
+        r"\s*[:.;]?\s*(\d+)\s*(?:pi|p[il1]|\u03c0)\s*/\s*(\d+)", re.I),
+    re.compile(r"confusion\s*((?:counter|anti)[\s\-]*)?clock\s*-?\s*wise\s*[:.;]?\s*(\d+)\s*(?:pi|\u03c0)\s*/\s*(\d+)", re.I),
+    re.compile(r"((?:counter|anti)[\s\-]*)?clock\s*-?\s*wise\s*confusion\s*[:.;]?\s*(\d+)\s*(?:pi|\u03c0)\s*/\s*(\d+)", re.I),
+]
+_CONF = _CONF_PATTERNS[0]
 
 
 def parse_confusion(text, strict=True):
     """Rotation d'une ligne de confusion, en quarts de tour horaires (0 à 3), ou None.
 
     Plusieurs lignes : la dernière l'emporte. Hors mode strict, le mot « Confusion » peut manquer
-    (« contre horaire : 6 Pi/4 »), pratique quand on tape la ligne à la main.
+    (« contre horaire : 6 Pi/4 », « clockwise 2 Pi/4 »), pratique quand on tape la ligne à la main.
     """
     if not text:
         return None
     if not strict and "confusion" not in text.lower():
         text = "Confusion " + text
-    last = None
-    for m in _CONF.finditer(text):
-        num, den = int(m.group(2)), int(m.group(3))
-        if den and (2 * num) % den == 0:             # n/d x 180° doit être un multiple de 90°
-            quarters = (2 * num) // den
-            last = (-quarters if m.group(1) else quarters) % 4
-    return last
+    found = []
+    for pattern in _CONF_PATTERNS:
+        for m in pattern.finditer(text):
+            num, den = int(m.group(2)), int(m.group(3))
+            if den and (2 * num) % den == 0:             # n/d x 180° doit être un multiple de 90°
+                quarters = (2 * num) // den
+                found.append((m.start(), (-quarters if m.group(1) else quarters) % 4))
+    return max(found)[1] if found else None
 
 
 # --- Géométrie de la grille -------------------------------------------------------
@@ -226,6 +239,8 @@ def has_los(fight, src, dst):
 
 
 def is_free(fight, cell):
+    if fight.free:
+        return True
     return cell in ARENA and cell not in fight.blocks and cell not in fight.pits
 
 
@@ -243,24 +258,25 @@ class Evaluation:
     def warnings(self):
         w = []
         if not self.aim_ok:
-            w.append("Case visée : hors de la carte" if self.aim not in ARENA else "Case visée : mur ou trou")
+            w.append(_t("Case visée : hors de la carte") if self.aim not in ARENA else _t("Case visée : mur ou trou"))
         if not self.landing_on_map:
-            w.append("Le sort atterrit hors de la carte")
+            w.append(_t("Le sort atterrit hors de la carte"))
         if not self.los_aim:
-            w.append("Pas de ligne de vue vers la case visée")
+            w.append(_t("Pas de ligne de vue vers la case visée"))
         if not self.los_landing and self.landing_on_map:
-            w.append("Pas de ligne de vue vers la case d'atterrissage")
+            w.append(_t("Pas de ligne de vue vers la case d'atterrissage"))
         return w
 
 
 def evaluate(fight, you, aim, k):
     land = landing_cell(you, aim, k)
+    on_map = fight.free or land in ARENA            # grille libre : toutes les cases comptent
     return Evaluation(
         k=k, aim=aim, landing=land,
         aim_ok=is_free(fight, aim),
-        landing_on_map=land in ARENA,
+        landing_on_map=on_map,
         los_aim=has_los(fight, you, aim),
-        los_landing=has_los(fight, you, land) if land in ARENA else True,
+        los_landing=has_los(fight, you, land) if on_map else True,
     )
 
 
@@ -286,7 +302,8 @@ class Calib:
         x, y = self.center(cell)
         return [(x, y - self.ky), (x + self.kx, y), (x, y + self.ky), (x - self.kx, y)]
 
-    def cell_at(self, x, y):
+    def cell_at(self, x, y, free=False):
+        """Case sous le point (x, y). free=True : n'importe quelle case de la grille, même hors de la salle."""
         af, bf = (y - self.y0) / self.ky, (x - self.x0) / self.kx
         best, best_d = None, 1e9
         for a in range(math.floor(af) - 1, math.floor(af) + 3):
@@ -296,7 +313,7 @@ class Calib:
                 d = abs(a - af) + abs(b - bf)
                 if d < best_d:
                     best, best_d = (a, b), d
-        return best if best in ARENA else None
+        return best if (free or best in ARENA) else None
 
     @staticmethod
     def from_anchors(top_xy, bottom_xy):

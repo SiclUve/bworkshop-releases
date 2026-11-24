@@ -13,6 +13,7 @@ import math
 from dataclasses import dataclass, field
 
 import core
+from i18n import _t
 
 GRID = (255, 255, 255, 55)
 BLOCK_FILL, BLOCK_LINE = (15, 15, 15, 170), (255, 130, 90, 220)
@@ -23,6 +24,7 @@ ANCHOR_FILL, ANCHOR_LINE = (255, 215, 0, 150), (255, 235, 90, 255)
 YOU_FILL, YOU_LINE = (255, 255, 255, 90), (255, 255, 255, 255)
 OUTLINE, OUTLINE_HALO = (63, 224, 232, 255), (0, 0, 0, 150)
 GRID_STRONG = (255, 255, 255, 130)
+GRID_FREE, GRID_FREE_STRONG = (255, 255, 255, 62), (255, 255, 255, 130)     # grande grille du mode Songes
 WARN = (255, 120, 100, 255)
 TEXT = (245, 245, 245, 255)
 MUTED = (170, 190, 195, 255)
@@ -33,6 +35,7 @@ LABEL_BG = (10, 20, 26, 215)
 class State:
     calib: core.Calib
     screen_w: int = 1920
+    screen_h: int = 1080
     fight: int = 0
     you: tuple = None
     hp_manual: float = 100.0
@@ -45,6 +48,15 @@ class State:
     show_grid: bool = False
     calibrating: bool = False                  # n'affiche que la grille et les obstacles
     origin: tuple = (0, 0)                     # coin haut-gauche de l'écran du jeu (coordonnées globales)
+
+    @property
+    def free(self):
+        """Mode Songes : grille libre, sans carte."""
+        return core.FIGHTS[self.fight].free
+
+    def cell_at(self, x, y):
+        """Case sous le point (x, y) : dans la salle, ou n'importe où en mode Songes."""
+        return self.calib.cell_at(x, y, free=self.free)
 
     def rotation(self):
         """(quarts de tour, origine). Origine : « invocation », « choisie » ou « pv »."""
@@ -69,8 +81,36 @@ def outline_prims(c):
     return halo + main
 
 
-def grid_prims(c, f, strong=False):
-    """La grille de la salle avec ses blocs et ses trous (strong : traits plus visibles, pour la calibration)."""
+def free_grid_prims(c, rect, strong=False):
+    """Une grande grille qui couvre tout le rectangle rect = (x, y, largeur, hauteur) : le mode Songes.
+
+    Les côtés des cases sont sur deux familles de droites : ligne - colonne = impair, et ligne + colonne = impair
+    (en demi-cases). On ne trace que celles qui traversent le rectangle.
+    """
+    rx, ry, rw, rh = rect
+    xl, xr, yt, yb = rx - c.kx, rx + rw + c.kx, ry - c.ky, ry + rh + c.ky
+    col, width = (GRID_FREE_STRONG, 1.2) if strong else (GRID_FREE, 1.0)
+    prims = []
+    for sign in (1, -1):                          # pente descendante (ligne - colonne), puis montante (ligne + colonne)
+        s0, s1 = sign * c.ky * (xl - c.x0) / c.kx, sign * c.ky * (xr - c.x0) / c.kx
+        lo = math.ceil((yt - c.y0 - max(s0, s1)) / c.ky)
+        hi = math.floor((yb - c.y0 - min(s0, s1)) / c.ky)
+        for m in range(lo, hi + 1):
+            if m % 2:
+                y = c.y0 + c.ky * m
+                prims.append(("line", (xl, y + s0), (xr, y + s1), col, width, False))
+    return prims
+
+
+def grid_prims(c, f, strong=False, rect=None):
+    """La grille de la salle avec ses blocs et ses trous (strong : traits plus visibles, pour la calibration).
+
+    En mode Songes (f.free), c'est une grande grille sur tout le rectangle rect de l'écran, sans carte.
+    """
+    if f.free:
+        if rect is None:
+            rect = (c.x0 - 30 * c.kx, c.y0 - 14 * c.ky, 60 * c.kx, 40 * c.ky)
+        return free_grid_prims(c, rect, strong)
     prims = [_poly(c, cell, None, GRID_STRONG if strong else GRID, 1.2 if strong else 1) for cell in sorted(core.ARENA)]
     prims += [_poly(c, cell, BLOCK_FILL, BLOCK_LINE, 1) for cell in sorted(f.blocks & core.ARENA)]
     prims += [_poly(c, cell, PIT_FILL, PIT_LINE, 1) for cell in sorted(f.pits)]
@@ -97,7 +137,7 @@ def dial_info(s):
     info = {"k": k, "source": source, "live": False, "aim_angle": 0.0, "needle_angle": (90.0 * k) % 360, "ok": True}
     if s.you is None:
         return info
-    aim = s.calib.cell_at(*s.mouse)
+    aim = s.cell_at(*s.mouse)
     if aim is None or aim == s.you:
         return info
     theta = cell_angle(s.you, aim)
@@ -109,11 +149,12 @@ def dial_info(s):
 def scene(s):
     """Renvoie (primitives, infos). `infos` sert aux tests et à la fenêtre de contrôle."""
     c, f = s.calib, core.FIGHTS[s.fight]
-    prims = grid_prims(c, f) if (s.show_grid or s.calibrating) else []
+    rect = (s.origin[0], s.origin[1], s.screen_w, s.screen_h)
+    prims = grid_prims(c, f, rect=rect) if (s.show_grid or s.calibrating or f.free) else []   # Songes : grille toujours là
     info = {"aim": None, "landing": None, "k": None, "source": None, "warnings": []}
     if s.calibrating:
         return prims, info
-    if s.flash:
+    if s.flash and not f.free:
         prims = prims + outline_prims(c)
 
     k, source = s.rotation()
@@ -122,10 +163,10 @@ def scene(s):
     if s.you is not None:
         prims.append(_poly(c, s.you, YOU_FILL, YOU_LINE, 2))
         x, y = c.center(s.you)
-        prims.append(("text", x, y, "TOI", TEXT, 11, None))
+        prims.append(("text", x, y, _t("TOI"), TEXT, 11, None))
 
     # Case visée par la souris et case d'atterrissage réelle
-    aim = c.cell_at(*s.mouse)
+    aim = s.cell_at(*s.mouse)
     if s.you is not None and aim is not None:
         ev = core.evaluate(f, s.you, aim, k)
         info.update(aim=aim, landing=ev.landing, warnings=ev.warnings)
@@ -135,7 +176,7 @@ def scene(s):
             prims.append(_poly(c, ev.landing, LAND_FILL, LAND_LINE, 3))
             prims.append(("line", c.center(s.you), c.center(ev.landing), LAND_LINE, 2.5, False))
             x, y = c.center(ev.landing)
-            label = "ATTERRIT ICI" if ev.landing != aim else "ATTERRIT SUR LA CASE VISÉE"
+            label = _t("ATTERRIT ICI") if ev.landing != aim else _t("ATTERRIT SUR LA CASE VISÉE")
             prims.append(("text", x, y - c.ky * 1.8, label, LAND_LINE, 12, LABEL_BG))
         if ev.warnings:
             x, y = c.center(aim)

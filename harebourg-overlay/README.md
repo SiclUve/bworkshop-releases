@@ -17,6 +17,15 @@ Tu lui donnes ta confusion (ou la ligne du chat copiée) ou ta tranche de PV. Il
 - `core.py` : la carte de la salle et les règles de la confusion.
 - `autocal.py` : calage automatique de la grille sur la capture.
 - `view.py`, `dial.py`, `theme.py` : l'affichage.
+- `i18n.py` : français et anglais. `safety.py` : réglages à l'épreuve des fichiers abîmés. `diagnostic.py` : `--diagnose`.
+- `installer.iss`, `build_exe.bat`, `build_installer.bat`, `version_info.txt` : construire l'exe et l'installateur (français / anglais).
+- `test_*.py`, `audit_songes.py` : les tests. `AUDIT.md` : l'audit. `README.en.md` : the English guide.
+
+## Nouveautés de la 0.3.0
+
+- Mode Songes (grille libre qui ne change jamais de taille) et case « Calage automatique » à décocher.
+- Programme et installateur en français et en anglais.
+- Réglages plus robustes, une seule instance, journal limité, `--diagnose` et `--selftest`.
 
 ## Lancer depuis le code
 

@@ -11,10 +11,12 @@ from PyQt6.QtGui import (QBrush, QColor, QConicalGradient, QPainter, QPainterPat
 from PyQt6.QtWidgets import QWidget
 
 import theme
+from i18n import _t
 
-TOOLTIP = ("Aiguille noire : où part ton sort.\nRepère cyan : où tu vises.\n"
-           "Sans visée (pas placé, souris hors de la salle), le repère reste en haut et l'aiguille\n"
-           "montre la rotation : si tu vises en haut, le sort part là où elle pointe.")
+def tooltip():
+    return _t("Aiguille noire : où part ton sort.\nRepère cyan : où tu vises.\n"
+              "Sans visée (pas placé, souris hors de la salle), le repère reste en haut et l'aiguille\n"
+              "montre la rotation : si tu vises en haut, le sort part là où elle pointe.")
 
 
 def _pt(c, r, deg):
@@ -35,7 +37,7 @@ class Dial(QWidget):
     def __init__(self, size=108):
         super().__init__()
         self.setFixedSize(size, size)
-        self.setToolTip(TOOLTIP)
+        self.setToolTip(tooltip())
         self.info = {"k": 0, "live": False, "aim_angle": 0.0, "needle_angle": 0.0, "ok": True}
         self.shown_needle = 0.0
         self.shown_aim = 0.0
