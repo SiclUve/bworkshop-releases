@@ -9,17 +9,18 @@ sys.path.insert(0, str(Path(__file__).parent))
 from PIL import Image
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QPixmap
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QWidget
 
 from dial import Dial
 
 app = QApplication([])
 d = Dial(256)
+d.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 d.set_info({"k": 1, "live": True, "aim_angle": 330.0, "needle_angle": 60.0, "ok": True})
 d.settle()
 pm = QPixmap(256, 256)
 pm.fill(QColor(0, 0, 0, 0))
-d.render(pm)
+d.render(pm, flags=QWidget.RenderFlag.DrawChildren)     # sans le fond gris de la fenêtre : icône transparente autour
 png = Path(__file__).with_name("icon.png")
 pm.save(str(png), "PNG")
 img = Image.open(png).convert("RGBA")
